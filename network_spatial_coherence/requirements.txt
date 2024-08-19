@@ -1,0 +1,15 @@
+matplotlib
+memory_profiler
+networkx
+nodevectors
+numpy
+pandas
+pecanpy
+Pillow
+igraph
+scienceplots
+scikit_learn
+scipy
+seaborn
+statsmodels
+umap_learn

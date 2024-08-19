@@ -89,25 +89,26 @@ pip install network_spatial_coherence
 
 
 ## Tree diagram
+```plaintext
 network_spatial_coherence/
 │
 ├── data/
-│ ├── edge_lists/ # CSV files: source, target, weight
-│ ├── original_positions/ # Original positions of nodes
-│ ├── reconstructed_positions/ # Positions after reconstruction
-│ ├── colorcode/ # Files for coloring nodes or edges
-│ └── network_json_format/ # Network data in JSON format
+│   ├── edge_lists/               # CSV files: source, target, weight
+│   ├── original_positions/       # Original positions of nodes
+│   ├── reconstructed_positions/  # Positions after reconstruction
+│   ├── colorcode/                # Files for coloring nodes or edges
+│   └── network_json_format/      # Network data in JSON format
 │
 └── results/
-├── output_dataframe/ # Comprehensive results in DataFrame format
-├── plots/ # General plots generated from analyses
-│ ├── original_image/ # Plots of the original graph representations
-│ ├── reconstructed_image/ # Plots showing reconstructed graph representations
-│ └── spatial_coherence_plots/ # Visualizations for analyzing spatial coherence
-├── spatial_constant/ # Spatial constants analyses
-│ ├── subgraph_sampling/ # Subgraph sampling analyses
-│ └── weighted_threshold/ # Threshold analyses
-└── predicted_dimension/ # Dimension predictions
-├── local_dimension/ # Local dimension plots
-├── heatmap_local_dimension/ # Heatmap of dimensions
-└── several_predictions/ # Multi-iteration dimension predictions
+    ├── output_dataframe/         # Comprehensive results in DataFrame format
+    ├── plots/                    # General plots generated from analyses
+    │   ├── original_image/        # Plots of the original graph representations
+    │   ├── reconstructed_image/   # Plots showing reconstructed graph representations
+    │   └── spatial_coherence_plots/  # Visualizations for analyzing spatial coherence
+    ├── spatial_constant/          # Spatial constants analyses
+    │   ├── subgraph_sampling/     # Subgraph sampling analyses
+    │   └── weighted_threshold/    # Threshold analyses
+    └── predicted_dimension/       # Dimension predictions
+        ├── local_dimension/       # Local dimension plots
+        ├── heatmap_local_dimension/  # Heatmap of dimensions
+        └── several_predictions/   # Multi-iteration dimension predictions

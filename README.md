@@ -18,7 +18,6 @@ pip install network_spatial_coherence
 ```
 
 
-```
 ## Example Results
 
 <table>

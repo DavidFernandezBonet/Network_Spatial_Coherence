@@ -97,8 +97,10 @@ single_graph_args, output_df = nsc.run_pipeline(graph, args)
 </table>
 
 ## Further information
-- [Directory Structure](directory_structure.md)
-- [GraphArgs Configuration](graph_args.md)
+- [Directory Structure](./network_spatial_coherence/markdown_files/directory_structure.md)
+- [GraphArgs Configuration](/network_spatial_coherence/markdown_files/graph_args.md)
+- [Results Location](/network_spatial_coherence/markdown_files/results.md)
+
 
 
 

@@ -65,18 +65,28 @@ single_graph_args, output_df = nsc.run_pipeline(graph, args)
 ```
 ## Example Results
 ### Spatially Coherent Network
-![OG Image](./network_spatial_coherence/example_plots/spatially_coherent/1.png)
-![SP Constant](./network_spatial_coherence/example_plots/spatially_coherent/2.svg)
-![Net Dim](./network_spatial_coherence/example_plots/spatially_coherent/3.svg)
-![Gram Mat](./network_spatial_coherence/example_plots/spatially_coherent/4.svg)
-![REC image](./network_spatial_coherence/example_plots/spatially_coherent/5.png)
+
+<table>
+  <tr>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_coherent/1.png" alt="OG Image" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_coherent/2.svg" alt="SP Constant" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_coherent/3.svg" alt="Net Dim" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_coherent/4.svg" alt="Gram Mat" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_coherent/5.png" alt="REC Image" width="200"/></td>
+  </tr>
+</table>
 
 ### Incoherent Network
-![OG Image](./network_spatial_coherence/example_plots/spatially_incoherent/1.png)
-![SP Constant](./network_spatial_coherence/example_plots/spatially_incoherent/2.svg)
-![Net Dim](./network_spatial_coherence/example_plots/spatially_incoherent/3.svg)
-![Gram Mat](./network_spatial_coherence/example_plots/spatially_incoherent/4.svg)
-![REC image](./network_spatial_coherence/example_plots/spatially_incoherent/5.png)
+
+<table>
+  <tr>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_incoherent/1.png" alt="OG Image" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_incoherent/2.svg" alt="SP Constant" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_incoherent/3.svg" alt="Net Dim" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_incoherent/4.svg" alt="Gram Mat" width="200"/></td>
+    <td><img src="./network_spatial_coherence/example_plots/spatially_incoherent/5.png" alt="REC Image" width="200"/></td>
+  </tr>
+</table>
 
 ## Further information
 - [Directory Structure](directory_structure.md)

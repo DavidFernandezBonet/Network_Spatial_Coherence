@@ -876,5 +876,5 @@ def write_network_in_json_format(args, positions_df, edges_df, network_type):
     # Write the graph dictionary to a JSON file
     with open(file_path, 'w') as f:
         json.dump(graph_data, f, indent=4)
-    print(f"Graph JSON file saved to {file_path}")
+    # print(f"Graph JSON file saved to {file_path}")
 

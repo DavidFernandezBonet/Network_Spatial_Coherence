@@ -138,7 +138,7 @@ class QualityMetrics:
         if distortion:
             distortion_result = self.compute_distortion()
             quality_metrics.update({"Distortion": distortion_result})
-        print(quality_metrics)
+        # print(quality_metrics)
         return quality_metrics
 
 
@@ -256,7 +256,7 @@ class GTA_Quality_Metrics:
         # self.gta_cpd_metric = None
         quality_metrics = {'GTA_KNN': self.gta_knn_metric, 'GTA_CPD': self.gta_cpd_metric}
 
-        print(quality_metrics)
+        # print(quality_metrics)
         return quality_metrics
     # Usage
 

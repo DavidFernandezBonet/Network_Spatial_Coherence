@@ -212,9 +212,9 @@ def create_project_structure(target_dir=None):
         with pkg_resources.path('network_spatial_coherence', filename) as source_path:
             dest_path = Path(project_root) / rel_dest / filename
             shutil.copy2(source_path, dest_path)
-            print(f"Copied {filename} to {dest_path}")
+            # print(f"Copied {filename} to {dest_path}")
 
-    print("hola")
+
     print(f"Project structure created under '{project_root}'")
     return directory_map
 

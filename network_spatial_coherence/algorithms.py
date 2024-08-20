@@ -587,7 +587,7 @@ class ImageReconstruction:
         if old_indices and args.node_ids_map_old_to_new:  # Preserve old indicies, this will make it so it doesn't go from 0 to N-1
             node_ids_map_new_to_old = {new: old for old, new in args.node_ids_map_old_to_new.items()}
 
-            print(args.node_ids_map_old_to_new)
+            # print(args.node_ids_map_old_to_new)
             node_ids = [node_ids_map_new_to_old[new_index] for new_index in sorted(node_ids_map_new_to_old)]
             positions_df['node_ID'] = node_ids
             # Define the output file path

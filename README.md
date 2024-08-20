@@ -63,12 +63,24 @@ args.edge_list_title = "your_graph_edge_list.csv"
 graph, args = nsc.load_and_initialize_graph(args=args)
 single_graph_args, output_df = nsc.run_pipeline(graph, args)
 ```
-
 ## Example Results
+### Spatially Coherent Network
+![OG Image](./network_spatial_coherence/example_plots/spatially_coherent/1.png)
+![SP Constant](./network_spatial_coherence/example_plots/spatially_coherent/2.svg)
+![Net Dim](./network_spatial_coherence/example_plots/spatially_coherent/3.svg)
+![Gram Mat](./network_spatial_coherence/example_plots/spatially_coherent/4.svg)
+![REC image](./network_spatial_coherence/example_plots/spatially_coherent/5.png)
 
-## Furhter information
-   - `[Directory Structure](directory_structure.md)`
-   - `[GraphArgs Configuration](graph_args.md)` 
+### Incoherent Network
+![OG Image](./network_spatial_coherence/example_plots/spatially_incoherent/1.png)
+![SP Constant](./network_spatial_coherence/example_plots/spatially_incoherent/2.svg)
+![Net Dim](./network_spatial_coherence/example_plots/spatially_incoherent/3.svg)
+![Gram Mat](./network_spatial_coherence/example_plots/spatially_incoherent/4.svg)
+![REC image](./network_spatial_coherence/example_plots/spatially_incoherent/5.png)
+
+## Further information
+- [Directory Structure](directory_structure.md)
+- [GraphArgs Configuration](graph_args.md)
 
 
 

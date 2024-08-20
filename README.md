@@ -66,11 +66,10 @@ single_graph_args, output_df = nsc.run_pipeline(graph, args)
 
 
 
-1. **Links to Sections:**
-   - `[Directory Structure](./directory_structure.md)` creates a link to the `directory_structure.md` file.
-   - `[GraphArgs Configuration](./graph_args.md)` creates a link to the `graph_args.md` file.
+## Furhter information
+   - `[Directory Structure](directory_structure.md)`
+   - `[GraphArgs Configuration](graph_args.md)` 
 
-2. **Markdown File Organization
 
 
 

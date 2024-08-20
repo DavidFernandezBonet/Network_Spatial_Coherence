@@ -50,16 +50,13 @@ pip install network_spatial_coherence
 </table>
 
 
-
 ## Further information
 - [Usage + Examples](./network_spatial_coherence/markdown_files/usage.md)
 - [Directory Structure](./network_spatial_coherence/markdown_files/directory_structure.md)
 - [GraphArgs Configuration](./network_spatial_coherence/markdown_files/graph_args.md)
 - [Results Location](./network_spatial_coherence/markdown_files/results.md)
-- [Interactive Visualization](./network_spatial_coherence/viz_3d.html)
-- [Interactive Viz]((https://DavidFernandezBonet.github.io/Network_Spatial_Coherence/network_spatial_coherence/viz_3d.html)
-- [Interactive Viz]((https://DavidFernandezBonet.github.io/network_spatial_coherence/viz_3d.html)
-- [Interactive Viz]((https://DavidFernandezBonet.github.io/Network_Spatial_Coherence/network_spatial_coherence/viz_3d.html)
+- [Interactive Visualization](https://DavidFernandezBonet.github.io/Network_Spatial_Coherence/network_spatial_coherence/viz_3d.html)
+
 
 
 

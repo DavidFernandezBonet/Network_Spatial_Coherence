@@ -1,14 +1,9 @@
 # Usage
 For a detailed tutorial, see the [Jupyter Notebook Tutorial](./network_spatial_coherence/network_spatial_coherence_tutorial.ipynb) in this repository.
 
-1. Access documentation for detailed API usage:
 
-```python
-from network_spatial_coherence.docs_util import access_docs
-access_docs()
-```
 
-2. Example run
+## Example run
 
 ```python
 import network_spatial_coherence.nsc_pipeline as nsc
@@ -36,10 +31,18 @@ single_graph_args, output_df = nsc.run_pipeline(graph, args)
 print(output_df)
 ```
 
-3. Using custom (your own!) graphs
+## Using custom (your own!) graphs
 Before using your own graph, make sure the edge list is in the 'data/edge_lists' directory.
 ```python
 args.proximity_mode = "experimental"
 args.edge_list_title = "your_graph_edge_list.csv"
 graph, args = nsc.load_and_initialize_graph(args=args)
 single_graph_args, output_df = nsc.run_pipeline(graph, args)
+```
+
+## Access documentation for detailed API usage:
+
+```python
+from network_spatial_coherence.docs_util import access_docs
+access_docs()
+```

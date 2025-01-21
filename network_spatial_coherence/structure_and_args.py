@@ -331,6 +331,8 @@ class GraphArgs:
         self.density_anomalies = config.get('density_anomalies', False)
 
         self.format_plots = config.get('format_plots', 'svg')
+        self.write_json_format = config.get('write_json_format', False)
+        self.precompute_shortest_paths = config.get('precompute_shortest_paths', False)
 
         self.handle_all_subgraphs = config.get('handle_all_subgraphs', False)
         self.spatial_coherence_validation = config.get('spatial_coherence_validation', False)

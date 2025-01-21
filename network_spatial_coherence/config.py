@@ -8,6 +8,8 @@ base = {
     "plot_graph_properties": False,
     "show_plots": True,
     "format_plots": 'svg',  #pdf, png...
+    "write_json_format": False,
+    "precompute_shortest_paths": False,
 
     "large_graph_subsampling": False,   # If the graph is large, subsample it to save time and memory. Cap at 3000 nodes  #TODO: implement this
     "max_subgraph_size": 4000,

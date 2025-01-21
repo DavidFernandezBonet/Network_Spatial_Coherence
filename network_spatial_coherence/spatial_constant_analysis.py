@@ -154,7 +154,9 @@ def run_reconstruction(args, sparse_graph, node_embedding_mode='ggvec', manifild
             original_points = read_position_df(args)
             original_df = read_position_df(args, return_df=True)
             # plot_original_or_reconstructed_image(args, image_type='original')
-        write_network_in_json_format(positions_df=original_df, args=args, edges_df=edge_list, network_type='original')
+
+        if write_json_format:
+            write_network_in_json_format(positions_df=original_df, args=args, edges_df=edge_list, network_type='original')
 
 
         qm = QualityMetrics(original_points, reconstructed_points)
@@ -167,7 +169,9 @@ def run_reconstruction(args, sparse_graph, node_embedding_mode='ggvec', manifild
     edges_df_rec = pd.read_csv(f"{edge_list_folder}/{args.edge_list_title}")
     reconstructed_position_folder = args.directory_map["reconstructed_positions"]
     reconstructed_df = pd.read_csv(f"{reconstructed_position_folder}/positions_{args.args_title}.csv")
-    write_network_in_json_format(positions_df=reconstructed_df, args=args, edges_df=edges_df_rec,
+
+    if write_json_format:
+        write_network_in_json_format(positions_df=reconstructed_df, args=args, edges_df=edges_df_rec,
                                  network_type='reconstructed')
 
     # GTA metrics

@@ -370,7 +370,7 @@ def reconstruct_graph(graph, args):
         print("ground truth available:", ground_truth_available)
     reconstructed_points, metrics =(
         run_reconstruction(args, sparse_graph=graph, ground_truth_available=ground_truth_available,
-                       node_embedding_mode=args.reconstruction_mode))
+                       node_embedding_mode=args.reconstruction_mode, write_json_format=args.write_json_format))
 
     if ground_truth_available:
         args.spatial_coherence_quantiative_dict.update(metrics['ground_truth'])
@@ -400,7 +400,7 @@ def collect_graph_properties(args):
         ]
     }
 
-    large_world_score = compute_largeworldness(args, sparse_graph=args.sparse_graph)
+    # large_world_score = compute_largeworldness(args, sparse_graph=args.sparse_graph)
 
     # Create DataFrame
     graph_properties_df = pd.DataFrame(properties_dict)
@@ -415,7 +415,7 @@ def collect_graph_properties(args):
         args.spatial_coherence_quantiative_dict['clustering_coefficient'] = args.mean_clustering_coefficient
     if args.mean_shortest_path:
         args.spatial_coherence_quantiative_dict['mean_shortest_path'] = args.mean_shortest_path
-    args.spatial_coherence_quantiative_dict['largeworldness'] = large_world_score
+    # args.spatial_coherence_quantiative_dict['largeworldness'] = large_world_score
     args.spatial_coherence_quantiative_dict['proximity_mode'] = args.proximity_mode
     args.spatial_coherence_quantiative_dict['dimension'] = args.dim
     args.spatial_coherence_quantiative_dict['edge_list_title'] = args.edge_list_title
@@ -503,7 +503,12 @@ def run_pipeline(graph, args):
         plot_original_or_reconstructed_image(args, image_type='original')
 
     plot_and_analyze_graph(graph, args)
-    args = compute_shortest_paths(graph, args)
+
+    if args.precompute_shortest_paths:
+        args = compute_shortest_paths(graph, args)
+    else:
+        args.shortest_path_matrix = []
+        args.mean_shortest_path = 0
 
     # Collect graph properties into DataFrame
     args, graph_properties_df = collect_graph_properties(args)

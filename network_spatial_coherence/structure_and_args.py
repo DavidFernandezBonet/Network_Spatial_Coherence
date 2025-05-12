@@ -166,6 +166,7 @@ def create_project_structure(target_dir=None):
         'plots': f'{project_root}/results/plots',
         'plots_original_image': f'{project_root}/results/plots/original_image',
         'plots_reconstructed_image': f'{project_root}/results/plots/reconstructed_image',
+        'comparative_plots': f'{project_root}/results/plots/comparative_plots',
         'spatial_coherence': f'{project_root}/results/spatial_coherence_plots',  #TODO: Main folder
         'dataframes': f'{project_root}/results/plots/multiple_runs_dataframes',
 

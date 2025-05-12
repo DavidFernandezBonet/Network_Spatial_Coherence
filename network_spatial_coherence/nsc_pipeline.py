@@ -504,7 +504,14 @@ def run_pipeline(graph, args):
 
     plot_and_analyze_graph(graph, args)
 
-    if args.precompute_shortest_paths:
+    should_precompute = (
+        args.precompute_shortest_paths or
+        args.spatial_coherence_validation.get('spatial_constant', False) or
+        args.spatial_coherence_validation.get('network_dimension', False) or
+        args.spatial_coherence_validation.get('gram_matrix', False)
+    )
+
+    if should_precompute:
         args = compute_shortest_paths(graph, args)
     else:
         args.shortest_path_matrix = []

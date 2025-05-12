@@ -1,6 +1,4 @@
 # Usage
-For a detailed tutorial, see the [Jupyter Notebook Tutorial](./network_spatial_coherence/network_spatial_coherence_tutorial.ipynb) in this repository.
-
 
 
 ## Example run

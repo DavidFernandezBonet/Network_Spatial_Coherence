@@ -279,8 +279,7 @@ def run_dimension_prediction_continuous(args, distance_matrix, num_central_nodes
 
     variances = np.array(std_errors) ** 2
     variances[variances == 0] = 1e-10
-    print("variances", variances)
-    print("predicted_dimensions", predicted_dimensions)
+
     weighted_avg_dimension = np.sum(np.array(predicted_dimensions) / variances) / np.sum(1 / variances)
     std_error_weighted_avg = np.sqrt(1 / np.sum(1 / variances))
     results_dimension_prediction['predicted_dimension'] = weighted_avg_dimension
@@ -823,8 +822,7 @@ def compute_dimension_prediction_fits(args, central_nodes, num_central_nodes, di
 
     variances = np.array(std_errors) ** 2
     variances[variances == 0] = 1e-10
-    print("variances", variances)
-    print("predicted_dimensions", predicted_dimensions)
+
     weighted_avg_dimension = np.sum(np.array(predicted_dimensions) / variances) / np.sum(1 / variances)
     std_error_weighted_avg = np.sqrt(1 / np.sum(1 / variances))
     results_dimension_prediction['predicted_dimension'] = weighted_avg_dimension

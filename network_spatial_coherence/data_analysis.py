@@ -1022,7 +1022,6 @@ def process_subgraph__bfs_parallel_with_depth(depth, args, igraph_graph, n_subgr
 
     # closeness = igraph_graph.closeness()
     # central_nodes = sorted(range(len(closeness)), key=lambda i: closeness[i], reverse=True)[:n_subgraphs]
-    print("depth:", depth)
 
     subgraphs = get_bfs_samples_by_depth(igraph_graph, n_graphs=n_subgraphs, bfs_depth=depth, node_ids=None)
 

@@ -62,6 +62,11 @@ For a quick introduction refer to [Usage and Examples](./network_spatial_coheren
 ## Interactive Network Viz
 - [Interactive Visualization](https://DavidFernandezBonet.github.io/Network_Spatial_Coherence/network_spatial_coherence/viz_3d.html)
 
+## Citation
+If you use this method or refer to its concepts in your research, please cite:  
+Bonet, D. F., Blumenthal, J. I., Lang, S., Dahlberg, S. K., & Hoffecker, I. T. (2024). *Spatial coherence of DNA barcode networks*. *bioRxiv*. [https://doi.org/10.1101/2024.05.12.593725](https://doi.org/10.1101/2024.05.12.593725)
+Bonet, D. F., & Hoffecker, I. T. (2023). *Image recovery from unknown network mechanisms for DNA sequencing-based microscopy*. *Nanoscale, 15*(18), 8153–8157. [https://doi.org/10.1039/D2NR05435C](https://doi.org/10.1039/D2NR05435C)
+
 
 
 

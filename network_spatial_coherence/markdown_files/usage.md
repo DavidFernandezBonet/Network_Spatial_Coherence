@@ -51,6 +51,7 @@ args.spatial_coherence_validation['gram_matrix'] = False
 args.spatial_coherence_validation['network_dimension'] = False
 args.spatial_coherence_validation['spatial_constant'] = False
 args.spatial_coherence_validation['fast_gram_matrix'] = True
+# For even faster results, run: args.spsatial_coherence_validation['sample_gram_matrix'] = True
 
 args.plot_original_image = False
 args.reconstruct = False

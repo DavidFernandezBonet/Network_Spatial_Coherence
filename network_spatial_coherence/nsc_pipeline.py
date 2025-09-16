@@ -22,7 +22,7 @@ from plots import plot_original_or_reconstructed_image
 from utils import *
 from spatial_constant_analysis import run_reconstruction
 from dimension_prediction import run_dimension_prediction, run_dimension_prediction_continuous
-from gram_matrix_analysis import plot_gram_matrix_eigenvalues
+from gram_matrix_analysis import plot_gram_matrix_eigenvalues, gram_eigvals_nystrom_from_landmarks, plot_gram_matrix_eigenvalues_from_eigenvalues
 from gram_matrix_analysis import plot_gram_matrix_first_eigenvalues_contribution
 # from torch_geometric.nn import Node2Vec
 # from torch_geometric.data import Data
@@ -314,22 +314,53 @@ def rank_matrix_analysis(args):
 
     return args, first_d_values_contribution
 
+def fast_gram_matrix_analysis(args):
+    t0 = time.perf_counter()
+    k = 1000
+    A = args.sparse_graph
+    landmarks, C, W = choose_landmarks_unweighted(A, k, first="degree", seed=0)
+    landmark_eigenvalues = gram_eigvals_nystrom_from_landmarks(C, W, r=None)
+    first_d_values_contribution = plot_gram_matrix_eigenvalues_from_eigenvalues(args, landmark_eigenvalues)
 
+    t1 = time.perf_counter()
+    print(f"Fast gram matrix analysis took {t1 - t0:.4f} seconds")
+    args.spatial_coherence_quantiative_dict['time_gram_matrix_analysis_landmark'] = t1 - t0
+    return args, first_d_values_contribution
 
+def sample_gram_matrix_analysis(args):
+    min_nodes = args.max_subgraph_size
+    A = sample_csgraph_subgraph(args, args.sparse_graph, min_nodes=min_nodes)
 
+    t0 = time.perf_counter()
+    if args.shortest_path_matrix is None:
+        args.shortest_path_matrix = compute_shortest_path_matrix_sparse_graph(A, args)
+    first_d_values_contribution,\
+    first_d_values_contribution_5_eigen,\
+    spectral_gap, \
+    last_spectral_gap, \
+    first_2_values_contribution_5_eigen = plot_gram_matrix_eigenvalues(args=args, shortest_path_matrix=args.shortest_path_matrix,
+                                                                       extra_info=f'_{min_nodes}_sample')
 
+    # results_dict = {"first_d_values_contribution": first_d_values_contribution, "first_d_values_contribution_5_eigen":
+    #     first_d_values_contribution_5_eigen, "spectral_gap": spectral_gap}
+    #
+    # results_dict = pd.DataFrame(results_dict, index=[0])
+    # results_dict['Category'] = 'Spatial_Coherence'
+    # return results_dict
+    args.spatial_coherence_quantiative_dict.update( {
+        'gram_total_contribution': first_d_values_contribution_5_eigen,
+        'gram_2_top_eigenvalues_contribution': first_2_values_contribution_5_eigen,
+        'gram_total_contribution_all_eigens': first_d_values_contribution,
+        'gram_spectral_gap': spectral_gap,
+        'gram_last_spectral_gap': last_spectral_gap
+    })
+    t1 = time.perf_counter()
+    print(f"Sample gram matrix analysis took {t1 - t0:.4f} seconds")
 
-    # another_sp_matrix = np.array(shortest_path(csgraph=args.sparse_graph, directed=False))
-    # args.num_edges = args.sparse_graph.nnz // 2
-    # args.num_points = args.sparse_graph.shape[0]
-    # args.shortest_path_matrix = compute_shortest_path_matrix_sparse_graph(sparse_graph=args.sparse_graph, args=None)
-    # sp_2 = args.shortest_path_matrix
-    # print("CUIDADU SI TRUE", np.array_equal(sp_copy, sp_2))  # Output: True
-    # print("CUIDADU SI TRUE 2", np.array_equal(sp_copy, another_sp_matrix))  # Output: True
-    # args.mean_shortest_path = args.shortest_path_matrix.mean()
+    # update the time in the quantitative dict
+    args.spatial_coherence_quantiative_dict['time_gram_matrix_analysis_sample'] = t1 - t0
+    return args, first_d_values_contribution
 
-    # # TODO: one could iterate the algorithm again to delete even more false edges
-    return denoised_graph, args
 
 
 @profile
@@ -531,6 +562,10 @@ def run_pipeline(graph, args):
         args, results_pred_dimension_df = network_dimension(args)
     if args.spatial_coherence_validation['gram_matrix']:
         args, results_gram_matrix_df = rank_matrix_analysis(args)
+    if args.spatial_coherence_validation['fast_gram_matrix']:
+        args, results_fast_gram_matrix_df = fast_gram_matrix_analysis(args)
+    if args.spatial_coherence_validation['sample_gram_matrix']:
+        args, results_fast_gram_matrix_df = sample_gram_matrix_analysis(args)
 
     # Reconstruction metrics
     if args.reconstruct:

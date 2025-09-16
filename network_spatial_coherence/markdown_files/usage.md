@@ -38,6 +38,33 @@ graph, args = nsc.load_and_initialize_graph(args=args)
 single_graph_args, output_df = nsc.run_pipeline(graph, args)
 ```
 
+## Fast Gram Matrix eigenvalues computation
+```python
+import pandas as pd
+
+args = GraphArgs()
+args.proximity_mode = "experimental"
+args.edge_list_title = "your_graph_edge_list.csv"
+args.spatial_coherence_validation['gram_matrix'] = False
+args.spatial_coherence_validation['network_dimension'] = False
+args.spatial_coherence_validation['spatial_constant'] = False
+args.spatial_coherence_validation['fast_gram_matrix'] = True
+
+args.plot_original_image = False
+args.reconstruct = False
+args.plot_reconstructed_image = False
+
+graph, args = nsc.load_and_initialize_graph(args=args)
+single_graph_args, output_df = nsc.run_pipeline(graph, args)
+
+# Make pandas show everything
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", None)
+pd.set_option("display.colheader_justify", "center")
+print(output_df.to_string(index=False))
+```
+
 ## Access documentation for detailed API usage:
 
 ```python

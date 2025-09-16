@@ -1144,7 +1144,7 @@ def plot_gram_matrix_euclidean_and_shortest_path_comparative(args, eigenvalues_e
         plt.show()
     plt.close()
 
-def plot_gram_matrix_first_eigenvalues_contribution(args, eigenvalues):
+def plot_gram_matrix_first_eigenvalues_contribution(args, eigenvalues, extra_info=None):
     dim = args.dim
     color = '#009ADE'
     # Consider only positive eigenvalues, up to the first 5
@@ -1165,6 +1165,14 @@ def plot_gram_matrix_first_eigenvalues_contribution(args, eigenvalues):
     line, = ax.plot(range(1, len(eigenvalues) + 1), cumulative_variance * 100, '-o', color='r', label=f'Contribution at '
                                                                                                       f'Dim={args.dim}: '
                                                                                                       f'{cumulative_variance_first_d_eigenvalues * 100:.2f}%')
+
+    args.spatial_coherence_quantiative_dict.update({
+        f'1_eigenvalue_contribution{extra_info}': variance_proportion[0] * 100 if len(variance_proportion) > 0 else 0,
+        f'2_eigenvalue_contribution{extra_info}': variance_proportion[1] * 100 if len(variance_proportion) > 1 else 0,
+        f'3_eigenvalue_contribution{extra_info}': variance_proportion[2] * 100 if len(variance_proportion) > 2 else 0,
+        f'4_eigenvalue_contribution{extra_info}': variance_proportion[3] * 100 if len(variance_proportion) > 3 else 0,
+        f'5_eigenvalue_contribution{extra_info}': variance_proportion[4] * 100 if len(variance_proportion) > 4 else 0,
+    })
 
     # Annotate each bar with its percentage
     for bar, proportion in zip(bars, variance_proportion):
@@ -1227,7 +1235,7 @@ def plot_gram_matrix_first_eigenvalues_contribution(args, eigenvalues):
     return cumulative_variance_first_d_eigenvalues, gap_score_normalized, last_spectral_gap
 
 
-def plot_gram_matrix_first_eigenvalues_contribution_clean(args, eigenvalues):
+def plot_gram_matrix_first_eigenvalues_contribution_clean(args, eigenvalues, extra_info=''):
     dim = args.dim
     color = '#009ADE'
     # Consider only positive eigenvalues, up to the first 5
@@ -1313,6 +1321,76 @@ def make_comparative_gram_matrix_plot_euc_sp(useful_plot_folder):
     eigenvalues_sp_matrix = compute_gram_matrix_eigenvalues(distance_matrix=sp_matrix)
     eigenvalues_euclidean = compute_gram_matrix_eigenvalues(distance_matrix=original_dist_matrix)
     plot_gram_matrix_euclidean_and_shortest_path_comparative(args, eigenvalues_euclidean, eigenvalues_sp_matrix, useful_plot_folder)
+
+
+def plot_gram_matrix_eigenvalues_from_eigenvalues(args, eigenvalues_sp_matrix):
+    # 1 - Contribution
+    # # this plots the total contribution with negative eigenvalues
+    first_d_values_contribution = plot_cumulative_eigenvalue_contribution(args, eigenvalues=eigenvalues_sp_matrix, original=False)
+
+    # # this plots the contribution of the first 5 eigenvalues
+    first_d_values_contribution_5_eigen, spectral_gap, last_spectral_gap = (
+        plot_gram_matrix_first_eigenvalues_contribution(args, eigenvalues=eigenvalues_sp_matrix, extra_info="_landmark"))
+
+    # this does the same as the previous but with modified plotting
+    first_d_values_contribution_5_eigen, spectral_gap, last_spectral_gap = (
+        plot_gram_matrix_first_eigenvalues_contribution_clean(args, eigenvalues=eigenvalues_sp_matrix, extra_info="_landmark"))
+    if args.verbose:
+        print("First d values contribution", first_d_values_contribution)
+        print("First d values contribution 5 eigen", first_d_values_contribution_5_eigen)
+    # 2 - Spectral Gap #
+    spectral_gap_between_d_and_d1 = plot_spectral_gap_and_analyze_negatives(args, eigenvalues=eigenvalues_sp_matrix)
+    return first_d_values_contribution_5_eigen
+
+def _center_both(X):
+    """Center rows and columns of a dense matrix X (J_left X J_right)."""
+    row_mean = X.mean(axis=1, keepdims=True)
+    col_mean = X.mean(axis=0, keepdims=True)
+    grand = X.mean()
+    return X - row_mean - col_mean + grand
+
+def gram_eigvals_nystrom_from_landmarks(C, W, r=None, eps=1e-10):
+    n, k = C.shape
+    if W.shape != (k, k):
+        raise ValueError("W must be (k, k) matching C's second dimension.")
+
+    # Centered blocks for the kernel B
+    C2 = C**2
+    W2 = W**2
+
+    # B_LL: center within landmarks only
+    B_LL = -0.5 * _center_both(W2)
+
+    # B_UL: center C^2 across rows (n) and columns (k)
+    B_UL = -0.5 * _center_both(C2)   # shape (n, k)
+
+    # Eigendecomp B_LL to build B_LL^{-1/2} (pseudoinverse if needed)
+    lam, U = np.linalg.eigh(B_LL)
+    pos = lam > eps
+    if not np.any(pos):
+        # Degenerate: all eigenvalues ~0 (can happen if k is too small)
+        return np.zeros(0, dtype=float)
+
+    Upos = U[:, pos]                    # (k, k')
+    invsqrt = 1.0 / np.sqrt(lam[pos])   # (k',)
+
+    # T = B_UL * B_LL^{-1/2} = B_UL * Upos * diag(invsqrt)
+    T = B_UL @ (Upos * invsqrt)
+
+    # Eigenvalues of B ≈ singular_values(T)^2
+    # T is n x k' (k' <= k), so SVD is cheap; keep only top-r if asked
+    if r is None or r >= T.shape[1]:
+        s = np.linalg.svd(T, full_matrices=False, compute_uv=False)
+    else:
+        # small-k: full SVD still fine; for huge k you could swap to a randomized SVD
+        s = np.linalg.svd(T, full_matrices=False, compute_uv=False)[:r]
+
+    w = (s**2)
+    w.sort()
+    w = w[::-1]
+    if r is not None:
+        w = w[:r]
+    return w
 
 
 

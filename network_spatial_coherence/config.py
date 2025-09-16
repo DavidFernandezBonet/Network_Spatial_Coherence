@@ -16,7 +16,7 @@ base = {
     "reconstruct": False,
     "reconstruction_mode": "STRND",  # STRND, ggvec, landmark_isomap, PyMDE, MDS
 
-    "spatial_coherence_validation": {"spatial_constant": True, "network_dimension": True, "gram_matrix": True},
+    "spatial_coherence_validation": {"spatial_constant": True, "network_dimension": True, "gram_matrix": True, "fast_gram_matrix": False, "sample_gram_matrix": False},
     "community_detection": False,
     "handle_all_subgraphs": False,
     'plot_original_image': True,

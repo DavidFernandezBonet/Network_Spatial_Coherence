@@ -1308,3 +1308,80 @@ def rank_based_combination(community_scores, betweenness_scores):
 
     combined_scores = {edge: rank for edge, rank in zip(edges, combined_ranks)}
     return combined_scores
+
+
+def choose_landmarks_unweighted(A, k, *, first="degree", seed=0, symmetrize=True):
+    """
+    Pick k landmarks on a connected, unweighted graph using farthest-point (Gonzalez),
+    and return:
+      - landmarks: indices (in the original graph) of the k landmarks, shape (k,)
+      - C: n x k matrix of shortest-path distances from every node to each landmark
+      - W: k x k matrix of shortest-path distances among landmarks
+
+    Args:
+        A (scipy.sparse matrix): adjacency of an undirected, connected, unweighted graph.
+                                 CSR/CSC/COO accepted. Nonzero = edge (weight ignored).
+        k (int): number of landmarks to select.
+        first (str or int): 'degree' (max degree), 'random', or an explicit node index.
+        seed (int): RNG seed if first='random'.
+        symmetrize (bool): if True, make A = max(A, A.T) for safety.
+
+    Returns:
+        landmarks (np.ndarray), C (np.ndarray), W (np.ndarray)
+    """
+    if not sp.isspmatrix(A):
+        raise TypeError("A must be a SciPy sparse matrix.")
+    if not sp.isspmatrix_csr(A):
+        A = A.tocsr()
+    if symmetrize:
+        # ensure undirected view
+        A = A.maximum(A.T)
+
+    n = A.shape[0]
+    if k > n:
+        raise ValueError(f"k={k} exceeds number of nodes n={n}.")
+
+    # --- choose first landmark
+    if isinstance(first, int):
+        first_local = int(first)
+        if not (0 <= first_local < n):
+            raise ValueError("first index out of range.")
+    elif first == "degree":
+        # degree from CSR indptr is fastest
+        deg = np.diff(A.indptr)
+        first_local = int(np.argmax(deg))
+    elif first == "random":
+        rng = np.random.default_rng(seed)
+        first_local = int(rng.integers(0, n))
+    else:
+        raise ValueError("first must be 'degree', 'random', or an integer node index.")
+
+    landmarks = [first_local]
+
+    # first BFS distances
+    d_first = shortest_path(A, directed=False, indices=[first_local],
+                            unweighted=True, method="auto")[0]
+    # min distance to current landmark set
+    min_dist = d_first.copy()  # shape (n,)
+
+    # --- greedy farthest-point selection
+    for _ in range(1, k):
+        far_idx = int(np.argmax(min_dist))
+        landmarks.append(far_idx)
+        d_new = shortest_path(A, directed=False, indices=[far_idx],
+                              unweighted=True, method="auto")[0]
+        np.minimum(min_dist, d_new, out=min_dist)
+
+    landmarks = np.array(landmarks, dtype=int)
+
+    # --- distances from all k landmarks (do in one call for speed)
+    D_k_to_all = shortest_path(A, directed=False, indices=landmarks,
+                               unweighted=True, method="auto")  # (k, n)
+
+    # Node→landmark distances: C is n x k
+    C = D_k_to_all.T
+
+    # Landmark↔landmark distances: pick columns at landmark positions
+    W = D_k_to_all[:, np.arange(k)]  # shape (k, k) because rows are already landmarks
+
+    return landmarks, C, W

@@ -40,6 +40,8 @@ single_graph_args, output_df = nsc.run_pipeline(graph, args)
 
 ## Fast Gram Matrix eigenvalues computation
 ```python
+import network_spatial_coherence.nsc_pipeline as nsc
+from network_spatial_coherence.structure_and_args import GraphArgs
 import pandas as pd
 
 args = GraphArgs()

@@ -338,7 +338,7 @@ def sample_gram_matrix_analysis(args):
     first_d_values_contribution_5_eigen,\
     spectral_gap, \
     last_spectral_gap, \
-    first_2_values_contribution_5_eigen = plot_gram_matrix_eigenvalues(args=args, shortest_path_matrix=args.shortest_path_matrix,
+    = plot_gram_matrix_eigenvalues(args=args, shortest_path_matrix=args.shortest_path_matrix,
                                                                        extra_info=f'_{min_nodes}_sample')
 
     # results_dict = {"first_d_values_contribution": first_d_values_contribution, "first_d_values_contribution_5_eigen":
@@ -349,7 +349,6 @@ def sample_gram_matrix_analysis(args):
     # return results_dict
     args.spatial_coherence_quantiative_dict.update( {
         'gram_total_contribution': first_d_values_contribution_5_eigen,
-        'gram_2_top_eigenvalues_contribution': first_2_values_contribution_5_eigen,
         'gram_total_contribution_all_eigens': first_d_values_contribution,
         'gram_spectral_gap': spectral_gap,
         'gram_last_spectral_gap': last_spectral_gap

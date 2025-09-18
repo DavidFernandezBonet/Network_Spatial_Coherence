@@ -993,7 +993,7 @@ def plot_spectral_gap_and_analyze_negatives(args, eigenvalues):
 
 
 
-def plot_gram_matrix_eigenvalues(args, shortest_path_matrix):
+def plot_gram_matrix_eigenvalues(args, shortest_path_matrix, extra_info=""):
     """
     Plots the cumulative eigenvalue contribution of a graph's shortest path matrix after converting it to a Gram matrix.
     It computes the eigenvalues of the Gram matrix derived from the shortest path matrix, then plots and saves the
@@ -1076,7 +1076,7 @@ def plot_gram_matrix_eigenvalues(args, shortest_path_matrix):
     # plt.xlabel('Index in Matrix')
     # plt.ylabel('Index in Matrix')
     # plt.show()
-
+    # #### end temporary plotting
     # args.shortest_path_matrix = original_dist_matrix
 
     return first_d_values_contribution, first_d_values_contribution_5_eigen, spectral_gap, last_spectral_gap
@@ -1323,18 +1323,18 @@ def make_comparative_gram_matrix_plot_euc_sp(useful_plot_folder):
     plot_gram_matrix_euclidean_and_shortest_path_comparative(args, eigenvalues_euclidean, eigenvalues_sp_matrix, useful_plot_folder)
 
 
-def plot_gram_matrix_eigenvalues_from_eigenvalues(args, eigenvalues_sp_matrix):
+def plot_gram_matrix_eigenvalues_from_eigenvalues(args, eigenvalues_sp_matrix, extra_info=""):
     # 1 - Contribution
     # # this plots the total contribution with negative eigenvalues
     first_d_values_contribution = plot_cumulative_eigenvalue_contribution(args, eigenvalues=eigenvalues_sp_matrix, original=False)
 
     # # this plots the contribution of the first 5 eigenvalues
     first_d_values_contribution_5_eigen, spectral_gap, last_spectral_gap = (
-        plot_gram_matrix_first_eigenvalues_contribution(args, eigenvalues=eigenvalues_sp_matrix, extra_info="_landmark"))
+        plot_gram_matrix_first_eigenvalues_contribution(args, eigenvalues=eigenvalues_sp_matrix, extra_info=extra_info))
 
     # this does the same as the previous but with modified plotting
     first_d_values_contribution_5_eigen, spectral_gap, last_spectral_gap = (
-        plot_gram_matrix_first_eigenvalues_contribution_clean(args, eigenvalues=eigenvalues_sp_matrix, extra_info="_landmark"))
+        plot_gram_matrix_first_eigenvalues_contribution_clean(args, eigenvalues=eigenvalues_sp_matrix, extra_info=extra_info))
     if args.verbose:
         print("First d values contribution", first_d_values_contribution)
         print("First d values contribution 5 eigen", first_d_values_contribution_5_eigen)

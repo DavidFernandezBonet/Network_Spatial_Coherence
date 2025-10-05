@@ -360,7 +360,59 @@ def sample_gram_matrix_analysis(args):
     args.spatial_coherence_quantiative_dict['time_gram_matrix_analysis_sample'] = t1 - t0
     return args, first_d_values_contribution
 
+def sample_gram_matrix_analysis_multiple(args, random_seed=None, show_progress=True):
 
+    if random_seed is not None: np.random.seed(random_seed)
+
+    n_samples = args.spatial_coherence_validation['sample_gram_matrix_multiple']['num_samples']
+    min_nodes = args.spatial_coherence_validation['sample_gram_matrix_multiple']['sample_size']
+
+    if n_samples < 2: raise ValueError("n_samples must be >= 2.")
+
+    # Preserve/prepare
+    orig_sparse, orig_spm = args.sparse_graph, args.shortest_path_matrix
+    orig_max = getattr(args, "max_subgraph_size", None)
+    if min_nodes is not None: args.max_subgraph_size = min_nodes
+    metric_keys = [
+        "gram_total_contribution",
+        "gram_2_top_eigenvalues_contribution",
+        "gram_total_contribution_all_eigens",
+        "gram_spectral_gap",
+        "gram_last_spectral_gap",
+        "time_gram_matrix_analysis_sample",
+    ]
+    buckets = {k: [] for k in metric_keys}
+    t0 = time.perf_counter()
+
+    try:
+        for i in range(n_samples):
+            if show_progress: print(f"[{i+1}/{n_samples}]")
+            args.sparse_graph, args.shortest_path_matrix = orig_sparse, None
+            args, _ = sample_gram_matrix_analysis(args)
+            d = args.spatial_coherence_quantiative_dict
+            for k in metric_keys:
+                buckets[k].append(None if k not in d else (d[k] if isinstance(d[k], np.ndarray) else np.asarray(d[k])))
+
+        # Aggregate mean/variance (element-wise) back into args.spatial_coherence_quantiative_dict
+        for k, series in buckets.items():
+            clean = [x for x in series if x is not None]
+            if len(clean) < 2: continue
+            shape0 = clean[0].shape if isinstance(clean[0], np.ndarray) else ()
+            if any((isinstance(x, np.ndarray) and x.shape != shape0) or (not isinstance(x, np.ndarray) and shape0 != ()) for x in clean[1:]):
+                if show_progress: print(f"Skip '{k}' aggregation (shape mismatch).")
+                continue
+            stacked = np.stack([x if isinstance(x, np.ndarray) else np.asarray(x) for x in clean], axis=0)
+            mean, var = np.mean(stacked, axis=0), np.var(stacked, axis=0, ddof=1)
+            to_native = (lambda a: a.item() if np.ndim(a)==0 else a.tolist())
+            args.spatial_coherence_quantiative_dict[f"{k}_mean"] = to_native(mean)
+            args.spatial_coherence_quantiative_dict[f"{k}_var"]  = to_native(var)
+
+        args.spatial_coherence_quantiative_dict["n_samples_gram_matrix_analysis"] = n_samples
+        args.spatial_coherence_quantiative_dict["time_gram_matrix_analysis_multiple"] = time.perf_counter() - t0
+        return args, buckets
+    finally:
+        args.sparse_graph, args.shortest_path_matrix = orig_sparse, orig_spm
+        if orig_max is not None: args.max_subgraph_size = orig_max
 
 @profile
 def reconstruct_graph(graph, args):
@@ -565,6 +617,8 @@ def run_pipeline(graph, args):
         args, results_fast_gram_matrix_df = fast_gram_matrix_analysis(args)
     if args.spatial_coherence_validation['sample_gram_matrix']:
         args, results_fast_gram_matrix_df = sample_gram_matrix_analysis(args)
+    if args.spatial_coherence_validation['sample_gram_matrix_multiple']['enabled']:
+        args, results_fast_gram_matrix_df = sample_gram_matrix_analysis_multiple(args)
 
     # Reconstruction metrics
     if args.reconstruct:

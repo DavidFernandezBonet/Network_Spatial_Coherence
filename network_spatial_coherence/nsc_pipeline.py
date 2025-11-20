@@ -1,7 +1,7 @@
 import copy
 import sys
 from pathlib import Path
-
+import numbers
 import numpy as np
 import pandas as pd
 
@@ -373,7 +373,13 @@ def sample_gram_matrix_analysis_multiple(args, random_seed=None, show_progress=T
     orig_sparse, orig_spm = args.sparse_graph, args.shortest_path_matrix
     orig_max = getattr(args, "max_subgraph_size", None)
     if min_nodes is not None: args.max_subgraph_size = min_nodes
+
     metric_keys = [
+        "1_eigenvalue_contribution",
+        "2_eigenvalue_contribution",
+        "3_eigenvalue_contribution",
+        "4_eigenvalue_contribution",
+        "5_eigenvalue_contribution",
         "gram_total_contribution",
         "gram_2_top_eigenvalues_contribution",
         "gram_total_contribution_all_eigens",
@@ -403,12 +409,18 @@ def sample_gram_matrix_analysis_multiple(args, random_seed=None, show_progress=T
                 continue
             stacked = np.stack([x if isinstance(x, np.ndarray) else np.asarray(x) for x in clean], axis=0)
             mean, var = np.mean(stacked, axis=0), np.var(stacked, axis=0, ddof=1)
+            std = np.sqrt(var)
+
             to_native = (lambda a: a.item() if np.ndim(a)==0 else a.tolist())
             args.spatial_coherence_quantiative_dict[f"{k}_mean"] = to_native(mean)
-            args.spatial_coherence_quantiative_dict[f"{k}_var"]  = to_native(var)
+            args.spatial_coherence_quantiative_dict[f"{k}_std"]  = to_native(std)
 
-        args.spatial_coherence_quantiative_dict["n_samples_gram_matrix_analysis"] = n_samples
+            for i, x in enumerate(clean):
+                args.spatial_coherence_quantiative_dict[f"{k}_sample_{i}"] = x
+
+        args.spatial_coherence_quantiative_dict["n_samples_gram_matrix_analysis_multiple"] = n_samples
         args.spatial_coherence_quantiative_dict["time_gram_matrix_analysis_multiple"] = time.perf_counter() - t0
+        args.spatial_coherence_quantiative_dict["sample_size_gram_matrix_analysis_multiple"] =  min_nodes
         return args, buckets
     finally:
         args.sparse_graph, args.shortest_path_matrix = orig_sparse, orig_spm
@@ -627,18 +639,110 @@ def run_pipeline(graph, args):
     output_df = write_output_data(args)
     return args, output_df
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, (np.integer, np.int_, np.intc, np.intp, np.int8,
+                            np.int16, np.int32, np.int64, np.uint8,
+                            np.uint16, np.uint32, np.uint64)):
+            return int(obj)
+        if isinstance(obj, (np.floating, np.float_, np.float16, np.float32, np.float64)):
+            return float(obj)
+        return super(NumpyEncoder, self).default(obj)
 
-def run_pipeline_for_several_parameters(parameter_ranges):
-    args = GraphArgs()
+def format_param_value(value):
+    # Convert numpy arrays to list for consistency
+    if isinstance(value, np.ndarray):
+        value = value.tolist()
+    if isinstance(value, list):
+        if len(value) == 1:
+            return str(value[0])
+        # If it's a list of numbers, show the range
+        try:
+            numeric_values = [float(x) for x in value]
+            if min(numeric_values) == max(numeric_values):
+                return str(numeric_values[0])
+            else:
+                return f"{min(numeric_values)}-{max(numeric_values)}"
+        except Exception:
+            # For non-numeric lists, join the elements with a hyphen
+            return '-'.join(map(str, value))
+    return str(value)
+
+
+def generate_param_summary(params, exclude_keys=None):
+    if exclude_keys is None:
+        exclude_keys = {"edge_list_title"}  # Add more keys if needed
+
+    sorted_keys = sorted(k for k in params if k not in exclude_keys)
+    summary_parts = []
+    for key in sorted_keys:
+        value = params[key]
+        abbreviated_key = key[:4]  # Use first 4 characters as abbreviation
+        formatted_value = format_param_value(value)
+        summary_parts.append(f"{abbreviated_key}{formatted_value}")
+    return '_'.join(summary_parts)
+
+def bins_to_jsonable(bin_weights):
+    # {(a,b): w, ...} -> [{"start":a,"end":b,"value":w}, ...] (sorted by start)
+    return [
+        {"start": float(a), "end": float(b), "value": float(w)}
+        for (a, b), w in sorted(bin_weights.items(), key=lambda kv: kv[0][0])
+    ]
+
+def _is_tuple_keyed_dict(d):
+    return (
+        isinstance(d, dict) and d and
+        all(isinstance(k, tuple) and len(k) == 2 and
+            all(isinstance(x, numbers.Number) for x in k) for k in d.keys())
+    )
+
+
+def convert_tuple_keyed_dicts(obj):
+    """Recursively convert any {(a,b):w} dict into a JSONable list of records."""
+    if _is_tuple_keyed_dict(obj):
+        return bins_to_jsonable(obj)
+    if isinstance(obj, dict):
+        return {k: convert_tuple_keyed_dicts(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [convert_tuple_keyed_dicts(x) for x in obj]
+    # also normalize numpy scalars if needed
+    try:
+        import numpy as np
+        if isinstance(obj, (np.floating, np.integer)):
+            return obj.item()
+    except Exception:
+        pass
+    return obj
+
+def run_pipeline_for_several_parameters(parameter_ranges, try_mode=True):
+    # args = GraphArgs()
+    # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # param_keys = '_'.join(parameter_ranges.keys())  # Use keys to describe the folder
+    # base_output_dir = args.directory_map['output_dataframe']
+    # run_directory = f"{base_output_dir}/{timestamp}_{param_keys}"
+    # os.makedirs(run_directory, exist_ok=True)
+
+    args = GraphArgs()  # Assume GraphArgs() is defined elsewhere
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    param_keys = '_'.join(parameter_ranges.keys())  # Use keys to describe the folder
+    param_summary = generate_param_summary(parameter_ranges)
     base_output_dir = args.directory_map['output_dataframe']
-    run_directory = f"{base_output_dir}/{timestamp}_{param_keys}"
+    run_directory = f"{base_output_dir}/{timestamp}_{param_summary}"[:200]  # Limit to 200 characters for path length
     os.makedirs(run_directory, exist_ok=True)
+    metadata_path = os.path.join(run_directory, "metadata.json")
+
+    jsonable = convert_tuple_keyed_dicts(parameter_ranges)
+
+    with open(metadata_path, "w") as f:
+        json.dump(jsonable, f, indent=4, cls=NumpyEncoder)
+
+
 
     keys, values = zip(*parameter_ranges.items())
     total_iterations = len(list(product(*values)))
     for i, value_combination in enumerate(product(*values)):
+        start_time = time.time()
         if args.verbose:
             print("Iteration", i+1, "out of", total_iterations)
         param_dict = dict(zip(keys, value_combination))
@@ -650,20 +754,36 @@ def run_pipeline_for_several_parameters(parameter_ranges):
             args.original_edge_list_title = param_dict['edge_list_title']
 
         args.update_args_title()
-        print("intended degree", args.intended_av_degree)
-        print("args_title", args.args_title)
-        print("proximity mode", args.proximity_mode)
-        graph, args = load_and_initialize_graph(args)
+        print("param dict", param_dict)
+
+        if try_mode:
+            try:
+                graph, args = load_and_initialize_graph(args)
+            except Exception as e:
+                print(f"Error during load_and_initialize_graph: {e}")
+                continue  # Skip to the next iteration
+        else:
+            graph, args = load_and_initialize_graph(args)
 
         if args.num_points < 100:
             warnings.warn("Discarding graph because it has less than 100 nodes")
             continue
 
-        print("param dict", param_dict)
-        args, output_df = run_pipeline(graph, args)
+
+        if try_mode:
+            try:
+                args, output_df = run_pipeline(graph, args)
+            except Exception as e:
+                print(f"Error during run_pipeline: {e}")
+                continue  # Optional: decide if you want to continue on pipeline errors too
+        else:
+            args, output_df = run_pipeline(graph, args)
+
+
         end_time = time.time()  # Stop timing here
         elapsed_time = end_time - start_time  # Calculate elapsed time
 
+        print(f"\n==== Iteration {i + 1}/{total_iterations} completed in {elapsed_time:.2f} seconds ====\n")
 
         new_rows = []
         new_rows.append({"Property": "elapsed_time", "Value": elapsed_time, "Category": "Performance"})
@@ -683,25 +803,14 @@ def run_pipeline_for_several_parameters(parameter_ranges):
             new_rows.append({"Property": "std_false_edge_length", "Value": args.std_false_edge_length,
                              "Category": "Parameter"})
 
+
         current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         new_df = pd.DataFrame(new_rows)
         modified_output_df = output_df._append(new_df, ignore_index=True)
-
-        properties_to_delete = ["gram_total_contribution_all_eigens", "largeworldness", "gram_spectral_gap",
-                                "slope_spatial_constant_false_edge_100", "r2_slope_spatial_constant_false_edge_100",
-                                "ratio_slope_0_to_100_false_edges", "GTA_CPD", "GTA_KNN"]
-        value_to_delete = "not_computed"
-        mask_to_delete = modified_output_df["Property"].isin(properties_to_delete) & (
-                    modified_output_df["Value"] == value_to_delete)
-
-        # Drop rows matching the criteria
-        filtered_df = modified_output_df[~mask_to_delete]
-
-        # Save the filtered DataFrame to a CSV
-        filtered_df.to_csv(f"{run_directory}/quantitative_metrics_{args.args_title}_{current_time}.csv", index=False)
-
+        print("Saving results to", f"{run_directory}/quantitative_metrics_{args.args_title}_{current_time}.csv")
+        modified_output_df.to_csv(f"{run_directory}/quantitative_metrics_{args.args_title}_{current_time}.csv", index=False)
         print("--------------------------------------------------")
-
+    return
 
 if __name__ == "__main__":
 

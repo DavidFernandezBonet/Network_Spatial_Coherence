@@ -1,5 +1,9 @@
 # Network Spatial Coherence
-How good is your network? This package measures the spatial coherence of a network—how closely it resembles a physical network—. Additionally, it can reconstruct the network's original positions in space using the STRND algorithm. Networks can be simulated (if you don't have any) or imported, and weighted and bipartite networks are supported. For details, see [Spatial Coherence](https://www.biorxiv.org/content/10.1101/2024.05.12.593725v1.abstract) and [STRND](https://pubs.rsc.org/en/content/articlehtml/2023/nr/d2nr05435c) papers.
+What's the quality of your spatial network? 
+
+This package quantifies the spatial coherence of a network by measuring if network distances align with physical (Euclidean) distances. It helps you answer questions like: Do shortest-path network distances make spatial sense? Where, and by how much, does the network deviate from the geometric reality?
+
+Additionally, it can reconstruct the network's original positions in space using the STRND algorithm. Networks can be simulated (if you don't have any) or imported, and weighted and bipartite networks are supported. For details, see [Spatial Coherence](https://www.biorxiv.org/content/10.1101/2024.05.12.593725v1.abstract) and [STRND](https://pubs.rsc.org/en/content/articlehtml/2023/nr/d2nr05435c) papers.
 
 ## Features
 - Analyze the spatial coherence of a network

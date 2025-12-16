@@ -69,7 +69,8 @@ For a quick introduction refer to [Usage and Examples](./network_spatial_coheren
 ## Citation
 If you use this method or refer to its concepts in your research, please cite:  
 
-Bonet, D. F., Blumenthal, J. I., Lang, S., Dahlberg, S. K., & Hoffecker, I. T. (2024). *Spatial coherence of DNA barcode networks*. *bioRxiv*. [https://doi.org/10.1101/2024.05.12.593725](https://doi.org/10.1101/2024.05.12.593725)
+Bonet, D. F., Blumenthal, J. I., Lang, S., Dahlberg, S. K., & Hoffecker, I. T. (2025). *Spatial coherence in DNA barcode networks*. *Patterns*, *6*(12), 101428. [https://doi.org/10.1016/j.patter.2025.101428](https://doi.org/10.1016/j.patter.2025.101428)
+
 
 Bonet, D. F., & Hoffecker, I. T. (2023). *Image recovery from unknown network mechanisms for DNA sequencing-based microscopy*. *Nanoscale, 15*(18), 8153–8157. [https://doi.org/10.1039/D2NR05435C](https://doi.org/10.1039/D2NR05435C)
 

@@ -53,8 +53,8 @@ pip install network_spatial_coherence
   </tbody>
 </table>
 
-## Quick Intro
-[Usage and Examples](./network_spatial_coherence/markdown_files/usage.md)!
+## Intro (important to read)
+[Usage and Examples](./network_spatial_coherence/markdown_files/usage.md)
 
 
 ## Detailed information

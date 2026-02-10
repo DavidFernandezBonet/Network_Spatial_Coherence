@@ -6,21 +6,18 @@ Run a complete end-to-end test using the bundled example network:
     pip install network_spatial_coherence
     python -m network_spatial_coherence.examples.minimal_example
 
-This prints a summary table and creates a working directory such as:
+This prints a summary table and writes outputs under:
 
     /tmp/nsc_minimal_example_run/
 
-with results in:
+Key output folders:
 
-    results/output_dataframe/
-    results/spatial_coherence_plots/
-    results/plots/
-
-Typical runtime: **5–15 seconds** on a standard laptop.
-
-### Expected runtime
+    /tmp/nsc_minimal_example_run/results/output_dataframe/
+    /tmp/nsc_minimal_example_run/results/spatial_coherence_plots/
+    /tmp/nsc_minimal_example_run/results/plots/
 
 Typical runtime: **5–15 seconds** on a standard laptop.
+
 
 
 ## Example run

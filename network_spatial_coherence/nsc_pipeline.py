@@ -35,39 +35,51 @@ from datetime import datetime
 from algorithms import (edge_list_to_sparse_graph, compute_largeworldness, randomly_delete_edges)
 
 
+def _in_notebook() -> bool:
+    try:
+        from IPython import get_ipython  # type: ignore
+        shell = get_ipython().__class__.__name__
+        return shell == "ZMQInteractiveShell"  # Jupyter / JupyterLab
+    except Exception:
+        return False
+
 
 plt.style.use(['science', 'no-latex', 'nature'])
-# font_size = 24
-# plt.rcParams.update({'font.size': font_size})
-# plt.rcParams['axes.labelsize'] = font_size
-# plt.rcParams['axes.titlesize'] = font_size + 6
-# plt.rcParams['xtick.labelsize'] = font_size
-# plt.rcParams['ytick.labelsize'] = font_size
-# plt.rcParams['legend.fontsize'] = font_size - 10
+
+IN_NOTEBOOK = _in_notebook()
+
+# Defaults tuned for display
+if IN_NOTEBOOK:
+    base_figsize = (6, 4)  # good in notebooks
+    base_fontsize = 12
+    display_dpi = 110
+else:
+    base_figsize = (7.5, 5.5)  # fine for scripts
+    base_fontsize = 18
+    display_dpi = 150
 
 
-base_figsize = (6, 4.5)  # Width, Height in inches
-base_fontsize = 18
-plt.rcParams.update({
-    'figure.figsize': base_figsize,  # Set the default figure size
-    'figure.dpi': 300,  # Set the figure DPI for high-resolution images
-    'savefig.dpi': 300,  # DPI for saved figures
-    'font.size': base_fontsize,  # Base font size
-    'axes.labelsize': base_fontsize ,  # Font size for axis labels
-    'axes.titlesize': base_fontsize + 2,  # Font size for subplot titles
-    'xtick.labelsize': base_fontsize,  # Font size for X-axis tick labels
-    'ytick.labelsize': base_fontsize,  # Font size for Y-axis tick labels
-    'legend.fontsize': base_fontsize - 6,  # Font size for legends
-    'lines.linewidth': 2,  # Line width for plot lines
-    'lines.markersize': 6,  # Marker size for plot markers
-    'figure.autolayout': True,  # Automatically adjust subplot params to fit the figure
-    'text.usetex': False,  # Use LaTeX for text rendering (set to True if LaTeX is installed)
-})
+plt.rcParams.update(
+    {
+        "figure.figsize": base_figsize,
+        "figure.dpi": display_dpi,  # DISPLAY dpi
+        "savefig.dpi": 300,  # SAVE dpi stays publication-quality
+        "font.size": base_fontsize,
+        "axes.labelsize": base_fontsize,
+        "axes.titlesize": base_fontsize + 2,
+        "xtick.labelsize": base_fontsize,
+        "ytick.labelsize": base_fontsize,
+        "legend.fontsize": max(base_fontsize - 4, 8),
+        "lines.linewidth": 2,
+        "lines.markersize": 6,
+        "figure.autolayout": True,
+        "text.usetex": False,
+    }
+)
 
 
 np.random.seed(42)
 random.seed(42)
-
 
 
 # Global storage for profiling data
@@ -470,7 +482,6 @@ def reconstruct_graph(graph, args):
         args.spatial_coherence_quantiative_dict.update(metrics['ground_truth'])
     args.spatial_coherence_quantiative_dict.update(metrics['gta'])
     return args, metrics
-
 
 
 def collect_graph_properties(args):
@@ -1040,4 +1051,3 @@ if __name__ == "__main__":
             # output_df.to_csv(os.path.join(store_folder, f'quantitative_metrics_{args.args_title}.csv'), index=False)
             # # optionally profile every time
             plot_profiling_results(single_graph_args)  # Plot the results at the end
-

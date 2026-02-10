@@ -1,3 +1,9 @@
-from pkg_resources import get_distribution
+from importlib.metadata import PackageNotFoundError, version
 
-__version__ = get_distribution("network_spatial_coherence").version
+try:
+    # PyPI distribution name (usually uses hyphens)
+    __version__ = version("network-spatial-coherence")
+except PackageNotFoundError:
+    # Fallback for editable installs / source checkouts
+    __version__ = "unknown"
+

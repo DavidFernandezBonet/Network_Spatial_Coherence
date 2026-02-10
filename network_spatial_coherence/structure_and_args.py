@@ -344,18 +344,14 @@ class GraphArgs:
         self.plot_reconstructed_image = config.get('plot_reconstructed_image', False)
         self.spatial_coherence_quantiative_dict = {}
 
-
         self.weight_to_distance = config.get('weight_to_distance', False)
         self.weight_to_distance_fun = config.get('weight_to_distance_fun', 'exp')
         self.weight_converter = self.WeightToDistance()
 
-
         # subgraph stuff
-
 
         if self.reconstruct:
             self.reconstruction_mode = config.get('reconstruction_mode')
-
 
         self._intended_av_degree = config.get('intended_av_degree', 6)
         self.distance_decay_quantile = None # Optional attribute for distance decay proximity mode
@@ -373,8 +369,6 @@ class GraphArgs:
             self.weighted_threshold = config.get('weight_threshold', 0)
             self.distance_to_weight_fun = config.get('distance_to_weight', False)
 
-
-
         if self.proximity_mode == "experimental":
             ### Experiment specific
             self.title_experimental = config.get('title_experimental', None)
@@ -386,8 +380,6 @@ class GraphArgs:
 
         # self.update_proximity_mode()
         self.update_args_title()
-
-
 
         # Initialize additional properties to their defaults or based on other computed attributes
         self.false_edge_ids = []  # To store false edges if needed
@@ -403,7 +395,6 @@ class GraphArgs:
         self.colorcode = {-1: "gray", 0: "gray", 1: "green", 2: "red"}
         self.id_to_color_simulation = None
 
-
         # Store graph representations  #TODO: loading the 2 will be inefficient / memory intensive
         # Maybe add all graph propreties: nodes, edges, average degree...
         self.sparse_graph = None
@@ -412,63 +403,29 @@ class GraphArgs:
         self.mean_shortest_path = None
 
 
-        #
-        # self.edge_list_title = edge_list_title
-        # self.title_experimental = title_experimental
-        # self.code_folder = code_folder
-        # self._num_points = num_points
-        # self.L = L
-        # self._intended_av_degree = intended_av_degree
-        # self._base_proximity_mode = proximity_mode
-        # self._false_edges_count = false_edges_count
-        # self.false_edge_ids = []  # list of tuples containing the false edges added   # TODO: store them properly?
-        # self.update_proximity_mode()
-        # self._dim = dim
-        #
-        # # Graph properties
-        # self.is_bipartite = False
-        # self.bipartite_sets = None  # Adding this attribute
-        # self.average_degree = average_degree
-        # self.mean_clustering_coefficient = None
-        #
-        # # Shortest Path Matrix -- It is reused a lot, maybe store here. Maybe have a "graph object"
-        # self.shortest_path_matrix = None
-        #
-        # # Directory map
-        # self.directory_map = create_project_structure()
-        #
-        # self.plot_original = plot_original  #TODO: implement this as a true false event
-        #
-        # # auxiliary title (original, when graph is well connected and we don't have to grab largest component)
-        # self.original_title = None
-        #
-        #
-        # self.node_ids_map_old_to_new = None
-        # self.colorfile = None  # filename where the color ids are stored. It is a dataframe with Node_ID, color in columns
-        # self.colorcode = {-1: "gray", 0: "gray", 1: "green", 2: "red"}  # what colors to plot. This is based on weinstein ploting
-        # self.id_to_color_simulation = None  # for colored simulations
+        self.spatial_coherence_validation = config.get(
+            "spatial_coherence_validation", {}
+        )
+        # Ensure spatial_coherence_validation is always a dict with required nested defaults
+        scv = self.spatial_coherence_validation
+        if not isinstance(scv, dict):
+            scv = {}
 
-    # def load_config(self, config_filename, code_folder):
-    #     """
-    #     Loads configuration from a Python file specified by combining the folder path and file name.
-    #
-    #     Parameters:
-    #         config_filename (str): The name of the configuration file.
-    #         code_folder (str): The folder where the configuration file is located.
-    #
-    #     Returns:
-    #         module: A module object containing the configurations.
-    #     """
-    #     # Combine the folder and filename to create the full path to the config file
-    #     config_path = os.path.join(code_folder, config_filename)
-    #
-    #     # Dynamically load the configuration module from the constructed path
-    #     spec = importlib.util.spec_from_file_location(config_filename, config_path)
-    #     config = importlib.util.module_from_spec(spec)
-    #     spec.loader.exec_module(config)
-    #     # Convert the module to a dictionary
-    #     config_dict = {key: getattr(config, key) for key in dir(config) if not key.startswith('__')}
-    #     return config_dict
+        scv.setdefault("gram_matrix", True)
+        scv.setdefault("network_dimension", True)
+        scv.setdefault("spatial_constant", True)
+        scv.setdefault("fast_gram_matrix", False)
+
+        sgm = scv.get("sample_gram_matrix_multiple")
+        if not isinstance(sgm, dict):
+            sgm = {}
+
+        sgm.setdefault("enabled", False)
+        sgm.setdefault("num_samples", 10)
+        sgm.setdefault("sample_size", 1000)
+
+        scv["sample_gram_matrix_multiple"] = sgm
+        self.spatial_coherence_validation = scv
 
     def load_config(self, override_config_path=None):
         config = default_config  # Start with the default config
@@ -486,8 +443,6 @@ class GraphArgs:
         # Convert the config module to a dictionary for compatibility with your existing code
         config_dict = {key: getattr(config, key) for key in dir(config) if not key.startswith('__')}
         return config_dict
-
-
 
     def get_config(self, config_module):
         """
@@ -511,7 +466,6 @@ class GraphArgs:
         else:
             # Merge base with simulation settings
             return {**base, **simulation}
-
 
     def update_args(self, **kwargs):
         """updates attributes of GraphArgs objects given a dictionary"""
@@ -541,7 +495,6 @@ class GraphArgs:
             # else:
             #     self.args_title = f"N={self._num_points}_dim={self._dim}_{self._proximity_mode}_k={self._intended_av_degree}"
 
-
             # self.args_title = f"N={self._num_points}_dim={self._dim}_{self._proximity_mode}_{os.path.splitext(self.edge_list_title)[0]}"
         else:
             ### Old setup for args and edge title
@@ -569,8 +522,6 @@ class GraphArgs:
             else:
                 self.args_title = f"{base_title}"
             self.edge_list_title = f"edge_list_{self.args_title}.csv"
-
-
 
     @property
     def num_points(self):
@@ -621,7 +572,6 @@ class GraphArgs:
 
         self.update_args_title()
 
-
     @property
     def dim(self):
         return self._dim
@@ -631,8 +581,6 @@ class GraphArgs:
         self._dim = value
         self.update_args_title()
 
-
-
     class WeightToDistance():
         def __init__(self, decay_rate=0.1, max_weight=100, inverse_power=2):
             # TODO: make sure that decay rate makes sense, I think it has to be in the "distance scale" (maybe take it as the median)
@@ -640,7 +588,6 @@ class GraphArgs:
             self.decay_rate = decay_rate  # Parameter for the exponential decay model
             self.max_weight = max_weight                        # Scaling factor for both models --> for exponential model it is the max weight
             self.inverse_power = inverse_power                # Exponent for the inverse power law model
-
 
         def return_weight_exponential_model(self, d):
             """Calculate the interaction weight using the negative exponential model."""
@@ -676,9 +623,6 @@ class GraphArgs:
                 print(math.log(w / self.max_weight))
                 raise ValueError("Negative or zero distance. Weight:", w, "Max weight:", self.max_weight, "Decay rate:", self.decay_rate)
             return d
-
-
-
 
         def return_weight_power_law_model(self, d):
             """Calculate the interaction weight using the inverse power law model."""
@@ -732,3 +676,5 @@ class GraphArgs:
             self.weight_threshold = None
             self.weighted_threshold = None
             self.distance_to_weight_fun = None
+
+# end of GraphArgs class

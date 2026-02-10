@@ -1,5 +1,34 @@
 # Usage
 
+## Quick Start: Minimal Working Example (5–10 seconds)
+This example runs the full pipeline on a small bundled test network and verifies
+that the installation is working correctly.
+
+### Step 1: Install
+
+    pip install network_spatial_coherence
+
+### Step 2: Run the built-in example
+
+    python -m network_spatial_coherence.examples.minimal_example
+
+### Expected output
+
+The script prints a summary table and creates a temporary working directory,
+for example:
+
+    /tmp/nsc_minimal_example_run/
+
+containing:
+
+    results/output_dataframe/
+    results/spatial_coherence_plots/
+    results/plots/
+
+### Expected runtime
+
+Typical runtime: **5–15 seconds** on a standard laptop.
+
 
 ## Example run
 
